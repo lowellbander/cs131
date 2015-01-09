@@ -55,10 +55,26 @@ let proper_subset_test1 = proper_subset [3;1;3] [1;2;3]
 let proper_subset_test2 = not (proper_subset [3] [3;3])
 
 (* returns the set difference of a - b *)
-let rec set_diff_rec this before after other = 
+let rec set_diff_rec before this after other = 
     match after with 
-    | [] -> before
-    | hd::tl -> before
+    | [] -> if (contains other this)
+            then []
+            else this::before
+    | hd::tl -> if (contains other this)
+                then (set_diff_rec before hd tl other)
+                else (set_diff_rec (this::before) hd tl other)
 ;;
 
+(* helper for set_diff_rec *)
+let set_diff a b = 
+    match a with
+    | [] -> []
+    | hd::tl -> set_diff_rec [] hd tl b
+;;
+
+let set_diff_test_0 = (set_diff [] []) = [];;
+let set_diff_test_1 = (set_diff [1] []) = [1];;
+let set_diff_test_2 = (set_diff [1] [1]) = [];;
+let set_diff_test_3 = (set_diff [1] [2]) = [1];;
+let set_diff_test_4 = (set_diff [1;2;3] [2]) = [1;3];;
 
