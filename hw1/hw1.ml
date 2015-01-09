@@ -23,6 +23,18 @@ let subset_test_3 = not (subset [1] []);;
 let subset_test_4 = subset [1;2;3] [1;2;3];;
 let subset_test_5 = not(subset [1;2;3] [1;2;4]);;
 
+let equals a b =
+    if (subset a b) then (subset b a) else false
+
+    (*and (subset a b) (subset b a)*)
+;;
+
+let equals_test_0 = equals [1;2;3] [1;2;3];;
+let equals_test_1 = equals [1;3;2] [1;2;3];;
+let equals_test_2 = equals [] [];;
+let equals_test_3 = not(equals [1] []);;
+let equals_test_3 = not(equals [1] [2]);;
+
 (* initially, called as:
     * unique 'a [] 'a list
  * returns unique elements in the third argument ('a list)
@@ -76,5 +88,7 @@ let set_diff_test_0 = (set_diff [] []) = [];;
 let set_diff_test_1 = (set_diff [1] []) = [1];;
 let set_diff_test_2 = (set_diff [1] [1]) = [];;
 let set_diff_test_3 = (set_diff [1] [2]) = [1];;
-let set_diff_test_4 = (set_diff [1;2;3] [2]) = [1;3];;
+let set_diff_test_4 = equals(set_diff [1;2;3] [2]) [1;3];;
+
+
 
