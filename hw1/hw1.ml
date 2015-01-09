@@ -27,23 +27,24 @@ let subset_test_5 = not(subset [1;2;3] [1;2;4]);;
     * unique 'a [] 'a list
  * returns unique elements in the third argument ('a list)
  * *)
-let rec unique_rec this before after = 
+let rec unique_rec before this after = 
     match after with 
     | [] -> this::before
     | hd::tl -> if (contains after this) 
-                then (unique_rec hd before tl) 
-                else (unique_rec hd (this::before) tl)
+                then (unique_rec before hd tl) 
+                else (unique_rec (this::before) hd tl)
 ;;
 
 (* helper for unique_rec *)
 let unique lst =
     match lst with
-    | hd::tl -> unique_rec hd [] tl
+    | hd::tl -> unique_rec [] hd tl
     | [] -> []
 ;;
 
 let unique_test_0 = unique [1;2;3];;
 let unique_test_1 = unique [2;2];;
+let unique_test_2 = unique [];;
 
 let proper_subset a b = 
     if (unique a = unique b) then false else (subset a b)
@@ -52,4 +53,12 @@ let proper_subset a b =
 let proper_subset_test0 = proper_subset [] [1;2;3]
 let proper_subset_test1 = proper_subset [3;1;3] [1;2;3]
 let proper_subset_test2 = not (proper_subset [3] [3;3])
+
+(* returns the set difference of a - b *)
+let rec set_diff_rec this before after other = 
+    match after with 
+    | [] -> before
+    | hd::tl -> before
+;;
+
 
