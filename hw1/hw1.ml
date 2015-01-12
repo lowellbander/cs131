@@ -23,17 +23,16 @@ let subset_test_3 = not (subset [1] []);;
 let subset_test_4 = subset [1;2;3] [1;2;3];;
 let subset_test_5 = not(subset [1;2;3] [1;2;4]);;
 
-let equals a b =
+let equal_sets a b =
     if (subset a b) then (subset b a) else false
-
-    (*and (subset a b) (subset b a)*)
 ;;
 
-let equals_test_0 = equals [1;2;3] [1;2;3];;
-let equals_test_1 = equals [1;3;2] [1;2;3];;
-let equals_test_2 = equals [] [];;
-let equals_test_3 = not(equals [1] []);;
-let equals_test_3 = not(equals [1] [2]);;
+let equal_sets_test_0 = equal_sets [1;2;3] [1;2;3];;
+let equal_sets_test_1 = equal_sets [1;3;2] [1;2;3];;
+let equal_sets_test_2 = equal_sets [] [];;
+let equal_sets_test_3 = not(equal_sets [1] []);;
+let equal_sets_test_3 = not(equal_sets [1] [2]);;
+let equal_sets_test_4 = equal_sets [3;1;3] [1;3];;
 
 (* initially, called as:
     * unique 'a [] 'a list
@@ -70,7 +69,7 @@ let proper_subset_test2 = not (proper_subset [3] [3;3])
 let rec set_diff_rec before this after other = 
     match after with 
     | [] -> if (contains other this)
-            then []
+            then before
             else this::before
     | hd::tl -> if (contains other this)
                 then (set_diff_rec before hd tl other)
@@ -88,7 +87,9 @@ let set_diff_test_0 = (set_diff [] []) = [];;
 let set_diff_test_1 = (set_diff [1] []) = [1];;
 let set_diff_test_2 = (set_diff [1] [1]) = [];;
 let set_diff_test_3 = (set_diff [1] [2]) = [1];;
-let set_diff_test_4 = equals(set_diff [1;2;3] [2]) [1;3];;
-
-
+let set_diff_test_4 = equal_sets (set_diff [1;2;3] [2]) [1;3];;
+let set_diff_test0 = equal_sets (set_diff [1;3] [1;4;3;1]) []
+let set_diff_test2 = equal_sets (set_diff [4;3;1] []) [1;3;4]
+let set_diff_test3 = equal_sets (set_diff [] [4;3;1]) []
+let set_diff_test1 = equal_sets (set_diff [4;3;1;1;3] [1;3]) [4]
 
