@@ -6,8 +6,8 @@ let rec contains p q =
 ;;
 
 let contains_test_0 = contains [1;2;3] 1;;
-let contains_test_1 = contains [1;2;3] 4;;
-let contains_test_2 = contains [] 4;;
+let contains_test_1 = not (contains [1;2;3] 4);;
+let contains_test_2 = not (contains [] 4);;
 
 (* returns true iff a subset of b *)
 let rec subset a b = 
