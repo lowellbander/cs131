@@ -109,3 +109,26 @@ let computed_fixed_point_test3 =
                              10.)
       = 1.25);;
 
+let rec eval_p_times f x p = 
+    if (0 < p)  then (eval_p_times f (f x) (p - 1))
+                else x
+;;
+
+let eval_p_times_test0 = eval_p_times (fun x -> x + x) 3 2;;
+
+let rec computed_periodic_point eq f p x =
+    if eq x (eval_p_times f x p) then x
+        else (computed_periodic_point eq f p (f x))
+;;
+
+(* Every point is a periodic point for p=0 *)
+let computed_periodic_point_test0 =
+    computed_periodic_point (=) (fun x -> x / 2) 0 (-1) = -1;;
+let computed_periodic_point_test1 =
+    computed_periodic_point (=) (fun x -> x *. x -. 1.) 2 0.5 = -1.;;
+
+(* TODO *)
+let filter_blind_alleys g =
+    g
+;;
+
