@@ -127,8 +127,56 @@ let computed_periodic_point_test0 =
 let computed_periodic_point_test1 =
     computed_periodic_point (=) (fun x -> x *. x -. 1.) 2 0.5 = -1.;;
 
+(* END WARMUP *)
+
+type giant_nonterminals =
+      | Conversation | Sentence | Grunt | Snore | Shout | Quiet
+
+let giant_grammar =
+    Conversation,
+    [Snore, [T"ZZZ"];
+    Quiet, [];
+    Grunt, [T"khrgh"];
+    Shout, [T"aooogah!"];
+    Sentence, [N Quiet];
+    Sentence, [N Grunt];
+    Sentence, [N Shout];
+    Conversation, [N Snore];
+    Conversation, [N Sentence; T","; N Conversation]]
+
+type ('nonterminal, 'terminal) symbol =
+    | N of 'nonterminal
+    | T of 'terminal
+;;
+
+(* probably should be the opposite *)
+let rec remove_blind_alleys_rec before rule after whitelist =
+    match after with 
+    | [] -> if (contains whitelist (fst rule))
+            then rule::before
+            else before
+    | hd::tl -> if (contains whitelist (fst rule))
+                then (remove_blind_alleys_rec (rule::before) hd tl whitelist)
+                else (remove_blind_alleys_rec before hd tl whitelist)
+;;
+
+let remove_blind_alleys whitelist rules =
+    match rules with
+    | [] -> []
+    | hd::tl -> remove_blind_alleys_rec [] hd tl whitelist
+;;
+
+let remove_blind_alleys_test0 = 
+    remove_blind_alleys [Snore] (snd giant_grammar);;
+
 (* TODO *)
 let filter_blind_alleys g =
-    g
+    match g with 
+    (starting_symbol, rules) -> rules
 ;;
+
+let giant_test0 =
+    filter_blind_alleys giant_grammar = giant_grammar;;
+
+filter_blind_alleys giant_grammar 
 
