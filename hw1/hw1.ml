@@ -175,7 +175,7 @@ let remove_blind_alleys_test0 =
 let is_terminal s = 
     match s with
     | N s -> false
-    | T s -> true
+    | T s -> false
 ;;
 
 (* all elements in rhs are either in the whitelist or are terminal *)
@@ -199,11 +199,15 @@ let rec make_whitelist (rules,whitelist) =
 ;;
 
 
-make_whitelist ((snd giant_grammar), [])
+List.rev (make_whitelist ((snd giant_grammar), []))
+
+computed_fixed_point (equal_sets) (make_whitelist) (rules, [])
 
 (* TODO *)
 let filter_blind_alleys g =
-    g
+    match g with
+    | (start, rules) -> 
+            computed_fixed_point (equal_sets) (make_whitelist) (rules, [])
 ;;
 
 let giant_test0 = filter_blind_alleys giant_grammar = giant_grammar;;
