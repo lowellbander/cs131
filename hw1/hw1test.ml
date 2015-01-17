@@ -79,6 +79,13 @@ let giant_grammar =
 let remove_blind_alleys_test0 = 
     remove_blind_alleys [Conversation] (snd giant_grammar);;
 
-let giant_test0 = filter_blind_alleys giant_grammar = giant_grammar;;
+(*let giant_test0 = filter_blind_alleys giant_grammar = giant_grammar;;*)
+
+make_whitelist ([(Conversation,[T"blargh"])], []);;
+make_whitelist ([(Conversation,[T"blargh"; N Sentence])], []);;
+
+make_whitelist ((snd giant_grammar), []);;
+
+computed_fixed_point (equal_sets) (make_whitelist) (rules, []);;
 
 
