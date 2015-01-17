@@ -96,8 +96,8 @@ let remove_blind_alleys whitelist rules =
 
 let is_terminal s = 
     match s with
-    | N s -> false
     | T s -> true
+    | _ -> false
 ;;
 
 (* all elements in rhs are either in the whitelist or are terminal *)

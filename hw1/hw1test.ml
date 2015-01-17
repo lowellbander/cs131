@@ -54,11 +54,6 @@ let computed_periodic_point_test0 =
 let computed_periodic_point_test1 =
     computed_periodic_point (=) (fun x -> x *. x -. 1.) 2 0.5 = -1.;;
 
-type ('nonterminal, 'terminal) symbol =
-    | N of 'nonterminal
-    | T of 'terminal
-;;
-
 type giant_nonterminals =
       | Conversation | Sentence | Grunt | Snore | Shout | Quiet
 
@@ -96,9 +91,8 @@ make_whitelist (snd sm_gram, []);;
 
 make_whitelist (snd med_gram, []);;
 
-
 make_whitelist (snd giant_grammar, []);;
 
-computed_fixed_point (equal_sets) (make_whitelist) (rules, []);;
+(* computed_fixed_point (equal_sets) (make_whitelist) (rules, []);; *)
 
 
