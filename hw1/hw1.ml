@@ -1,8 +1,8 @@
-(* returns true iff list p contains element q *)
-let rec contains p q = 
-   match p with 
+(* returns true iff list l contains element e *)
+let rec contains l e = 
+   match l with 
    | [] -> false
-   | hd::tl -> if hd=q then true else (contains tl q)
+   | hd::tl -> if hd = e then true else (contains tl e)
 ;;
 
 (* returns true iff a subset of b *)
@@ -104,7 +104,7 @@ let is_terminal s =
 let rec is_reachable rhs whitelist =
     match rhs with
     | [] -> true
-    | hd::tl -> if ((contains whitelist hd) || is_terminal hd)
+    | hd::tl -> if contains whitelist hd || is_terminal hd
                 then is_reachable tl whitelist
                 else false
 ;;

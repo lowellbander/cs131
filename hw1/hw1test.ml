@@ -73,26 +73,14 @@ let giant_grammar = Conversation, giant_rules;;
 let remove_blind_alleys_test0 = 
     remove_blind_alleys [Conversation] (snd giant_grammar);;
 
-(*let giant_test0 = filter_blind_alleys giant_grammar = giant_grammar;;*)
-
 let sm_gram = Conversation, [(Conversation,[T"blargh"])];;
-
 let med_gram = Conversation, [(Conversation,[T"blargh"; N Sentence])];;
-
 let lg_gram = Conversation, [(Conversation,[T"blargh"; N Sentence])];;
 
-make_whitelist (snd lg_gram, []);;
-
-sm_gram;;
-med_gram;;
-snd giant_grammar;;
-
-make_whitelist (snd sm_gram, []);;
-
-make_whitelist (snd med_gram, []);;
-
-make_whitelist (snd giant_grammar, []);;
+let make_whitelist_test0 =  make_whitelist (snd giant_grammar, []);;
+let make_whitelist_test1 =  make_whitelist (List.tl (snd giant_grammar), []);;
 
 (* computed_fixed_point (equal_sets) (make_whitelist) (rules, []);; *)
 
+(*let giant_test0 = filter_blind_alleys giant_grammar = giant_grammar;;*)
 
