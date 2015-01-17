@@ -189,17 +189,17 @@ let rec is_reachable rhs whitelist =
 
 (* create a list of symbols that either directly or indirectly map 
  * to a terminal character*)
-let rec make_whitelist rules whitelist = 
+let rec make_whitelist (rules,whitelist) = 
     match rules with
     | hd::tl -> let symb = N (fst hd) in
                 if is_reachable (snd hd) whitelist
-                then make_whitelist tl (symb::whitelist)
-                else make_whitelist tl whitelist
+                then make_whitelist (tl, (symb::whitelist))
+                else make_whitelist (tl, whitelist)
     | _ -> whitelist
 ;;
 
 
-make_whitelist (snd giant_grammar) []
+make_whitelist ((snd giant_grammar), [])
 
 (* TODO *)
 let filter_blind_alleys g =
