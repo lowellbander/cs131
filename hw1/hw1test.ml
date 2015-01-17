@@ -73,18 +73,31 @@ let giant_rules =
     Conversation, [N Snore];
     Conversation, [N Sentence; T","; N Conversation]];;
 
-let giant_grammar =
-    Conversation, giant_rules;;
+let giant_grammar = Conversation, giant_rules;;
 
 let remove_blind_alleys_test0 = 
     remove_blind_alleys [Conversation] (snd giant_grammar);;
 
 (*let giant_test0 = filter_blind_alleys giant_grammar = giant_grammar;;*)
 
-make_whitelist ([(Conversation,[T"blargh"])], []);;
-make_whitelist ([(Conversation,[T"blargh"; N Sentence])], []);;
+let sm_gram = Conversation, [(Conversation,[T"blargh"])];;
 
-make_whitelist ((snd giant_grammar), []);;
+let med_gram = Conversation, [(Conversation,[T"blargh"; N Sentence])];;
+
+let lg_gram = Conversation, [(Conversation,[T"blargh"; N Sentence])];;
+
+make_whitelist (snd lg_gram, []);;
+
+sm_gram;;
+med_gram;;
+snd giant_grammar;;
+
+make_whitelist (snd sm_gram, []);;
+
+make_whitelist (snd med_gram, []);;
+
+
+make_whitelist (snd giant_grammar, []);;
 
 computed_fixed_point (equal_sets) (make_whitelist) (rules, []);;
 
