@@ -129,11 +129,15 @@ let computed_periodic_point_test1 =
 
 (* END WARMUP *)
 
+type ('nonterminal, 'terminal) symbol =
+    | N of 'nonterminal
+    | T of 'terminal
+;;
+
 type giant_nonterminals =
       | Conversation | Sentence | Grunt | Snore | Shout | Quiet
 
-let giant_grammar =
-    Conversation,
+let giant_rules = 
     [Snore, [T"ZZZ"];
     Quiet, [];
     Grunt, [T"khrgh"];
@@ -142,14 +146,12 @@ let giant_grammar =
     Sentence, [N Grunt];
     Sentence, [N Shout];
     Conversation, [N Snore];
-    Conversation, [N Sentence; T","; N Conversation]]
+    Conversation, [N Sentence; T","; N Conversation]];;
 
-type ('nonterminal, 'terminal) symbol =
-    | N of 'nonterminal
-    | T of 'terminal
-;;
+let giant_grammar =
+    Conversation, giant_rules;;
 
-(* probably should be the opposite *)
+(* given a whitelist, remove all rules where LHS not in whitelist *)
 let rec remove_blind_alleys_rec before rule after whitelist =
     match after with 
     | [] -> if (contains whitelist (fst rule))
@@ -160,23 +162,51 @@ let rec remove_blind_alleys_rec before rule after whitelist =
                 else (remove_blind_alleys_rec before hd tl whitelist)
 ;;
 
+(* helper function for remove_blind_alleys_rec *)
 let remove_blind_alleys whitelist rules =
     match rules with
     | [] -> []
-    | hd::tl -> remove_blind_alleys_rec [] hd tl whitelist
+    | hd::tl -> List.rev(remove_blind_alleys_rec [] hd tl whitelist)
 ;;
 
 let remove_blind_alleys_test0 = 
-    remove_blind_alleys [Snore] (snd giant_grammar);;
+    remove_blind_alleys [Conversation] (snd giant_grammar);;
+
+let is_terminal s = 
+    match s with
+    | N s -> false
+    | T s -> true
+;;
+
+(* all elements in rhs are either in the whitelist or are terminal *)
+let rec is_reachable rhs whitelist =
+    match rhs with
+    | [] -> true
+    | hd::tl -> if ((contains whitelist hd) || is_terminal hd)
+                then is_reachable tl whitelist
+                else false
+;;
+
+(* create a list of symbols that either directly or indirectly map 
+ * to a terminal character*)
+let rec make_whitelist rules whitelist = 
+    match rules with
+    | hd::tl -> let symb = N (fst hd) in
+                if is_reachable (snd hd) whitelist
+                then make_whitelist tl (symb::whitelist)
+                else make_whitelist tl whitelist
+    | _ -> whitelist
+;;
+
+
+make_whitelist (snd giant_grammar) []
 
 (* TODO *)
 let filter_blind_alleys g =
-    match g with 
-    (starting_symbol, rules) -> rules
+    g
 ;;
 
-let giant_test0 =
-    filter_blind_alleys giant_grammar = giant_grammar;;
+let giant_test0 = filter_blind_alleys giant_grammar = giant_grammar;;
 
 filter_blind_alleys giant_grammar 
 
