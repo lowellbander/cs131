@@ -80,7 +80,9 @@ let lg_gram = Conversation, [(Conversation,[T"blargh"; N Sentence])];;
 let make_whitelist_test0 =  make_whitelist (snd giant_grammar, []);;
 let make_whitelist_test1 =  make_whitelist (List.tl (snd giant_grammar), []);;
 
-(* computed_fixed_point (equal_sets) (make_whitelist) (rules, []);; *)
+computed_fixed_point_wl (List.tl (List.tl (snd giant_grammar)), []);;
+
+(*computed_fixed_point (equal_sets) (make_whitelist) (snd giant_grammar, []);;*)
 
 (*let giant_test0 = filter_blind_alleys giant_grammar = giant_grammar;;*)
 

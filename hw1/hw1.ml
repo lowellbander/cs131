@@ -120,6 +120,11 @@ let rec make_whitelist (rules,whitelist) =
     | _ -> whitelist
 ;;
 
+let rec computed_fixed_point_wl (rules, whitelist) = 
+    if equal_sets whitelist (make_whitelist (rules, whitelist))
+    then whitelist
+    else computed_fixed_point_wl (rules, (make_whitelist (rules, whitelist)))
+;;
 
 (* TODO *)
 (*
