@@ -1,0 +1,56 @@
+
+subset a b
+
+    For my first function in OCaml, I implemented subset by checking to see that
+    every element in a was an element of b. To do this, I iterated through the
+    list recursively and used a helper function which determines whether an
+    element is contained in a set, using a similar recursive fashion.
+
+proper_subset a b
+    
+    A set p cannot be a proper_subset of a set q if the sets are equal, so in
+    this case the function reutrns false. If this is not the case, then
+    proper_subset has the same value as subset.
+
+equal_sets a b
+
+    The only way for a set p to be a subset of a set q and for the set q to be a
+    subset of the set p is for both sets to be equal. If this is the case, then
+    return true, else, return false.
+
+set_diff a b
+    
+    This function uses to recursion to examine each element in the first list.
+    For each such element, it checks to see if it is in the set b. If so, it is
+    not included in the returned list.
+
+computed_fixed_point eq f x
+
+    A fixed point of a function is such that calling the function on that point
+    returns the same point. Given a 'guess' for the fixed point, the function
+    recursively checks to see that either (1) calling the function again on its
+    input yields the same output, or (2) that we need to keep searching, in this
+    case by continuously calling this function 'on itself' until such a state as
+    described in this fist sentence of this paragraph is acheived.
+
+computed_periodic_point eq f x
+
+    This function is similar to the above except that in order to check if a
+    function is a periodic point, we see if the input variable is the same as
+    the output of the functuion applied p times to the original input.
+    
+filter_blind_alleys g
+
+    This function first generates a list of symbols which either directly or
+    indirectly can be transformed into a terminal character by way of the rules
+    provided by the grammar g. In order to generate a complete such whitelist,
+    the function is called repeatdedly until the whitelist does not change from
+    one iteration to the next.
+        Then, the blind-alleys are removed from the grammar. That is rules where
+    the LHS is not in the whitelist are removed from the grammar, and a new
+    grammar is returned.
+
+    Unfortunately, this last function throws an error because of mismatched
+    argument types. Subsequently, I was not able to test this file in its final
+    state.
+

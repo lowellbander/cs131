@@ -16,25 +16,6 @@ let equal_sets a b =
     if (subset a b) then (subset b a) else false
 ;;
 
-(* initially, called as:
-    * unique 'a [] 'a list
- * returns unique elements in the third argument ('a list)
- * *)
-let rec unique_rec before this after = 
-    match after with 
-    | [] -> this::before
-    | hd::tl -> if (contains after this) 
-                then (unique_rec before hd tl) 
-                else (unique_rec (this::before) hd tl)
-;;
-
-(* helper for unique_rec *)
-let unique lst =
-    match lst with
-    | hd::tl -> unique_rec [] hd tl
-    | [] -> []
-;;
-
 let proper_subset a b = 
     if (equal_sets a b) then false else (subset a b)
 ;;
@@ -126,12 +107,11 @@ let rec computed_fixed_point_wl (rules, whitelist) =
     else computed_fixed_point_wl (rules, (make_whitelist (rules, whitelist)))
 ;;
 
-(* TODO *)
-(*
 let filter_blind_alleys g =
     match g with
     | (start, rules) -> 
-            computed_fixed_point (equal_sets) (make_whitelist) (rules, [])
+            let whitelist = computed_fixed_point_wl (rules, []) in
+            let filtered_rules = remove_blind_alleys whitelist rules in
+            (start, filtered_rules)
 ;;
- *)
 
