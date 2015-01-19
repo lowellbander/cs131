@@ -36,7 +36,7 @@ let unique lst =
 ;;
 
 let proper_subset a b = 
-    if (unique a = unique b) then false else (subset a b)
+    if (equal_sets a b) then false else (subset a b)
 ;;
 
 (* returns the set difference of a - b *)
