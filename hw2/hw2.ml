@@ -14,12 +14,10 @@ let rec prod_func rule_list alternatives the_nonterm =
 let convert_grammar gram1 = 
     match gram1 with
     (start_symb, rule_list) -> (start_symb, prod_func rule_list [])
-                                (* rule_list : list of rules in gram1
-                                 * [] : the acceptor function (?)*)
 ;;
 
 (* returns a matcher for the grammar gram *)
-let parse_prefix gram =
-    gram
+let parse_prefix gram acceptor frag =
+    -1
 ;;
 
