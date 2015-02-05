@@ -3,6 +3,7 @@
 
 test_1(1, []).
 test_2(2, []).
+test_3(3, []).
 
 % implementation taken from the SWI-PROLOG clpfd library, modified.
 % https://github.com/SWI-Prolog/swipl/blob/master/library/clp/clpfd.pl
@@ -27,8 +28,8 @@ lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]) :-
 
 kenken(N, [], T):-  length(T, N),
                     distinct_null(N, T), % every row is distinct (?)
-                    %transpose(T, T_transposed),
-                    %distinct_null(N, T_transposed),
+                    transpose(T, T_transposed),
+                    distinct_null(N, T_transposed),
                     %statistics.
                     true.
 
@@ -39,8 +40,8 @@ kenken(N, [], T):-  length(T, N),
 % base case
 distinct_null(_, []).
 % recursive case
-distinct_null(N, [Lx|Ly]):- length(Lx, N),          % is of length N
-                            fd_domain(Lx, 1, N),    % only contains 1 ... N
+distinct_null(N, [Lx|Ly]):- length(Lx, N),          % Lx is of length N
+                            fd_domain(Lx, 1, N),    % Lx only contains 1 ... N
                             fd_all_different(Lx),   % all elements are different
                             fd_labeling(Lx),        % assigns vals to all elements
                             distinct_null(N, Ly).
