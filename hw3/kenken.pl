@@ -1,85 +1,118 @@
-% test cases
-% fd_set_vector_max(255), test_i(N,C), kenken(N,C,T).
+% BEGIN testcase
+ 
+kenken_testcase(
+    4, 
+    [
+        *(12, [1-1, 2-1]), 
+        -(2, 1-2, 1-3), 
+        +(2, [1-4]), 
+        -(1, 2-2, 3-2), 
+        /(2, 2-3, 3-3), 
+        -(1, 2-4, 3-4), 
+        +(1, [3-1]), 
+        /(2, 4-1, 4-2), 
+        +(4, [4-3, 4-4])
+    ]
+).
+% END testcase
 
-test_1(1, []).
-test_2(2, []).
-test_2a(2, [+(2,[1-2,2-1])]).
-test_3(3, []).
+iterate_all(_, []).
+iterate_all(Function, [Head|Tail]):-    call(Function, Head), 
+                                        iterate_all(Function, Tail).
+ 
+check_dom(N, L):-   fd_domain(L, 1, N).
 
-% implementation taken from the SWI-PROLOG clpfd library, modified.
-% https://github.com/SWI-Prolog/swipl/blob/master/library/clp/clpfd.pl
+row_len(N, L):- length(L, N).
+ 
+get_el(T, I-J, V):- nth(I, T, Row), 
+                    nth(J, Row, V).
 
-% transpose/2
-transpose([],[]).
-transpose([F|Fs], Ts):- transpose(F, [F|Fs], Ts).
-
-% transpose/3
-transpose([], _, []).
-transpose([_|Rs], Ms, [Ts|Tss]) :-  lists_firsts_rests(Ms, Ts, Ms1),
-                                    transpose(Rs, Ms1, Tss).
-
+trans([], []).
+trans([F|Fs], T):-  trans(F, [F|Fs], T).
+ 
+trans([], _, []).
+trans([_|R], M, [T|Ts]):-   lists_firsts_rests(M, T, Ms), 
+                            trans(R, Ms, Ts).
+ 
 lists_firsts_rests([], [], []).
-lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]) :-
+lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]):-
                                     lists_firsts_rests(Rest, Fs, Oss).
+ 
+% fdomain kenken implementation
+ 
+add_list(T, [], Res, Res).
+add_list(T, [H|L], S, Res):-    get_el(T, H, X), 
+                                Sum #= S + X, 
+                                add_list(T, L, Sum, Res).
+ 
+mult_list(T, [], Res, Res).
+mult_list(T, [H|L], P, Res):-
+    get_el(T, H, X), 
+    Prod #= P * X, 
+    mult_list(T, L, Prod, Res).
+ 
+calc(T, +(Res, List)):- add_list(T, List, 0, Res).
+calc(T, *(Res, List)):- mult_list(T, List, 1, Res).
+calc(T, /(Res, A, B)):- get_el(T, A, X), 
+                        get_el(T, B, Y), 
+                        (X * Res #= Y ; Y * Res #= X).
+calc(T, -(Res, A, B)):- get_el(T, A, X), 
+                        get_el(T, B, Y), 
+                        (Res #= X - Y ; Res #= Y - X).
+ 
+kenken(N, C, T):-   length(T, N), 
+                    iterate_all(row_len(N), T), 
+                    iterate_all(check_dom(N), T), 
+                    iterate_all(fd_all_different, T), 
+                    trans(T, XTrans), 
+                    iterate_all(fd_all_different, XTrans), 
+                    iterate_all(calc(T), C), 
+                    iterate_all(fd_labeling, T), 
+                    statistics.
+ 
+% plain kenken implementation
+ 
+range(N, L):-   findall(X, between(1, N, X), L).
+ 
+check_doplain([], _).
+check_doplain([H|T], R):-   member(H, R), 
+                            check_doplain(T, R).
+ 
+is_set(L):- setof(X, member(X, L), S), 
+            length(L, N), 
+            length(S, N).
+ 
+check_dom_plain([], _).
+check_dom_plain([H|T], R):- check_doplain(H, R), 
+                            is_set(H), 
+                            check_dom_plain(T, R).
+ 
+add_list_plain(T, [], Res, Res).
+add_list_plain(T, [H|L], S, Res):-  get_el(T, H, X), 
+                                    Sum is S + X, 
+                                    add_list_plain(T, L, Sum, Res).
+ 
+mult_list_plain(T, [], Res, Res).
+mult_list_plain(T, [H|L], P, Res):- get_el(T, H, X), 
+                                    Prod is P * X, 
+                                    mult_list_plain(T, L, Prod, Res).
+ 
+calc_plain(T, +(Res, List)):-   add_list_plain(T, List, 0, Res).
+calc_plain(T, *(Res, List)):-   mult_list_plain(T, List, 1, Res).
+calc_plain(T, /(Res, A, B)):-   get_el(T, A, X), 
+                                get_el(T, B, Y), 
+                                (Res is X // Y ; Res is Y // X).
 
-% implementation of kenken/3
-
-% T is the solution to the NxN kenken with constraint C.
-% It is represented as a list of rows.
-
-% when there are no constraints
-kenken(N, [], T):-  length(T, N),
-                    distinct_null(N, T), % every row is distinct (?)
-                    transpose(T, T_t),
-                    distinct_null(N, T_t),
-                    %statistics.
-                    true.
-
-% when there are constraints
-kenken(N, C, T):-   length(C, C_len),   % are this and the following line neccesary?
-                    C_len #>= 1,        %there must be at least one constraint
-                    length(T, N),
-                    distinct(N, T),
-                    transpose(T, T_t),
-                    distinct(N, T_t),
-                    run_tests(N, C, T),
-                    %statistics
-                    true.
-
-run_tests(_, [], _).
-run_tests(N, [Test|C], T):- test(Test, T, N),
-                            run_tests(N, C, T).
-
-% sum constraint
-test(+(A, B), L, N):- sum(A, B, 0, L, N).
-sum(V, [], E, _, _):- V #= E.
-sum(V, [A|B], E, L, N):-    A = AR-AC,
-                            element(L, AR, AC, E1, N),
-                            E2 #= E + E1,
-                            sum(V, B, E2, L, N).
-
-% product constraint
-% quotient constraint
-% difference constraint
-
-% fd_domain/3 - http://www.gprolog.org/manual/gprolog.html#sec307
-% fd_all_different/1 - http://www.gprolog.org/manual/gprolog.html#sec325
-% fd_labeling/1 - http://www.gprolog.org/manual/gprolog.html#fd-labeling%2F2
-
-% element/5
-element(L, R, C, Value, N):-    nth(R, L, V),
-                                nth(C, V, Value),
-                                fd_domain(Value, 1, N),
-                                fd_labeling(Value).
-
-distinct_null(_, []).
-distinct_null(N, [Head|Tail]):- length(Head, N),          % Head is of length N
-                                fd_domain(Head, 1, N),    % Head only contains 1 ... N
-                                fd_all_different(Head),   % all elements are different
-                                fd_labeling(Head),        % assigns vals to all elements
-                                distinct_null(N, Tail).
-                            
-distinct(_, []).
-distinct(N, [Head|Tail]):-  length(Head, N),
-                            fd_all_different(Head),
-                            distinct(N, Tail).
+calc_plain(T, -(Res, A, B)):-   get_el(T, A, X), 
+                                get_el(T, B, Y), 
+                                (Res is X - Y ; Res is Y - X).
+ 
+plain_kenken(N, C, T):- length(T, N), 
+                        range(N, R), 
+                        iterate_all(row_len(N), T), 
+                        check_dom_plain(T, R), 
+                        trans(T, XTrans), 
+                        iterate_all(is_set, XTrans), 
+                        iterate_all(calc_plain(T), C), 
+                        statistics.
+ 
