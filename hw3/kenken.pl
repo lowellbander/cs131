@@ -3,7 +3,7 @@
 
 test_1(1, []).
 test_2(2, []).
-test_2a(2, [+(2,[1-1,2-1])]).
+test_2a(2, [+(2,[1-2,2-1])]).
 test_3(3, []).
 
 % implementation taken from the SWI-PROLOG clpfd library, modified.
@@ -36,8 +36,8 @@ kenken(N, [], T):-  length(T, N),
                     true.
 
 % when there are constraints
-kenken(N, C, T):-   % length(C, C_len),   % are this and the following line neccesary?
-                    % C_len #>= 1,        %there must be at least one constraint
+kenken(N, C, T):-   length(C, C_len),   % are this and the following line neccesary?
+                    C_len #>= 1,        %there must be at least one constraint
                     length(T, N),
                     distinct(N, T),
                     transpose(T, T_t),
@@ -50,11 +50,27 @@ run_tests(_, [], _).
 run_tests(N, [Test|C], T):- test(Test, T, N),
                             run_tests(N, C, T).
 
+% sum constraint
 test(+(A, B), L, N):- sum(A, B, 0, L, N).
+sum(V, [], E, _, _):- V #= E.
+sum(V, [A|B], E, L, N):-    A = AR-AC,
+                            element(L, AR, AC, E1, N),
+                            E2 #= E + E1,
+                            sum(V, B, E2, L, N).
+
+% product constraint
+% quotient constraint
+% difference constraint
 
 % fd_domain/3 - http://www.gprolog.org/manual/gprolog.html#sec307
 % fd_all_different/1 - http://www.gprolog.org/manual/gprolog.html#sec325
 % fd_labeling/1 - http://www.gprolog.org/manual/gprolog.html#fd-labeling%2F2
+
+% element/5
+element(L, R, C, Value, N):-    nth(R, L, V),
+                                nth(C, V, Value),
+                                fd_domain(Value, 1, N),
+                                fd_labeling(Value).
 
 distinct_null(_, []).
 distinct_null(N, [Head|Tail]):- length(Head, N),          % Head is of length N
