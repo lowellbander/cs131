@@ -1,38 +1,46 @@
-% BEGIN testcase
+% BEGIN testcases
+
+test_0(2,[]).
  
 kenken_testcase(
-    4, 
+    6, 
     [
-        *(12, [1-1, 2-1]), 
-        -(2, 1-2, 1-3), 
-        +(2, [1-4]), 
-        -(1, 2-2, 3-2), 
-        /(2, 2-3, 3-3), 
-        -(1, 2-4, 3-4), 
-        +(1, [3-1]), 
-        /(2, 4-1, 4-2), 
-        +(4, [4-3, 4-4])
+        +(11, [1-1, 2-1]),
+        /(2, 1-2, 1-3),
+        *(20, [1-4, 2-4]),
+        *(6, [1-5, 1-6, 2-6, 3-6]),
+        -(3, 2-2, 2-3),
+        /(3, 2-5, 3-5),
+        *(240, [3-1, 3-2, 4-1, 4-2]),
+        *(6, [3-3, 3-4]),
+        *(6, [4-3, 5-3]),
+        +(7, [4-4, 5-4, 5-5]),
+        *(30, [4-5, 4-6]),
+        *(6, [5-1, 5-2]),
+        +(9, [5-6, 6-6]),
+        +(8, [6-1, 6-2, 6-3]),
+        /(2, 6-4, 6-5)
     ]
 ).
-% END testcase
+% END testcases
 
-iterate_all(_, []).
-iterate_all(Function, [Head|Tail]):-    call(Function, Head), 
-                                        iterate_all(Function, Tail).
- 
-check_dom(N, L):-   fd_domain(L, 1, N).
+rangesFrom1to(N, L):-   fd_domain(L, 1, N).
 
-row_len(N, L):- length(L, N).
- 
-get_el(T, I-J, V):- nth(I, T, Row), 
-                    nth(J, Row, V).
+% isOfLength/2 - checks that list L has length N
+isOfLength(N, L):- length(L, N).
 
-trans([], []).
-trans([F|Fs], T):-  trans(F, [F|Fs], T).
+% nth(I, T, E) - retrieve the Ith element of T and place it in E
+
+% E = Matrix[I][J]
+get(Matrix, I-J, E):-   nth(I, Matrix, Row), 
+                        nth(J, Row, E).
+
+transpose([], []).
+transpose([F|Fs], T):-  transpose(F, [F|Fs], T).
  
-trans([], _, []).
-trans([_|R], M, [T|Ts]):-   lists_firsts_rests(M, T, Ms), 
-                            trans(R, Ms, Ts).
+transpose([], _, []).
+transpose([_|R], M, [T|Ts]):-   lists_firsts_rests(M, T, Ms), 
+                                transpose(R, Ms, Ts).
  
 lists_firsts_rests([], [], []).
 lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]):-
@@ -40,35 +48,35 @@ lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]):-
  
 % fdomain kenken implementation
  
-add_list(T, [], Res, Res).
-add_list(T, [H|L], S, Res):-    get_el(T, H, X), 
-                                Sum #= S + X, 
-                                add_list(T, L, Sum, Res).
+sum(T, [], Result, Result).
+sum(T, [Head|Tail], OldSum, Result):-   get(T, Head, E), 
+                                        NewSum #= OldSum + E, 
+                                        sum(T, Tail, NewSum, Result).
  
-mult_list(T, [], Res, Res).
-mult_list(T, [H|L], P, Res):-
-    get_el(T, H, X), 
-    Prod #= P * X, 
-    mult_list(T, L, Prod, Res).
+mult_list(T, [], Result, Result).
+mult_list(T, [H|L], P, Result):-    get(T, H, X), 
+                                    Prod #= P * X, 
+                                    mult_list(T, L, Prod, Result).
  
-calc(T, +(Res, List)):- add_list(T, List, 0, Res).
-calc(T, *(Res, List)):- mult_list(T, List, 1, Res).
-calc(T, /(Res, A, B)):- get_el(T, A, X), 
-                        get_el(T, B, Y), 
-                        (X * Res #= Y ; Y * Res #= X).
-calc(T, -(Res, A, B)):- get_el(T, A, X), 
-                        get_el(T, B, Y), 
-                        (Res #= X - Y ; Res #= Y - X).
+test(T, +(Result, List)):- sum(T, List, 0, Result).
+test(T, *(Result, List)):- mult_list(T, List, 1, Result).
+test(T, /(Result, A, B)):- get(T, A, X), 
+                        get(T, B, Y), 
+                        (X * Result #= Y ; Y * Result #= X).
+test(T, -(Result, A, B)):- get(T, A, X), 
+                        get(T, B, Y), 
+                        (Result #= X - Y ; Result #= Y - X).
  
 kenken(N, C, T):-   length(T, N), 
-                    iterate_all(row_len(N), T), 
-                    iterate_all(check_dom(N), T), 
-                    iterate_all(fd_all_different, T), 
-                    trans(T, XTrans), 
-                    iterate_all(fd_all_different, XTrans), 
-                    iterate_all(calc(T), C), 
-                    iterate_all(fd_labeling, T), 
-                    statistics.
+                    maplist(isOfLength(N), T),      % T isOfLength N
+                    maplist(rangesFrom1to(N), T),   % every row in T is 1 ... N
+                    maplist(fd_all_different, T),   % and only has unique elements
+                    transpose(T, X_t),          % transpose the matrix
+                    maplist(fd_all_different, X_t), % and check for uniqueness
+                    maplist(test(T), C),            % check each constraint
+                    maplist(fd_labeling, T),        %
+                    % statistics.
+                    true.
  
 % plain kenken implementation
  
@@ -87,32 +95,33 @@ check_dom_plain([H|T], R):- check_doplain(H, R),
                             is_set(H), 
                             check_dom_plain(T, R).
  
-add_list_plain(T, [], Res, Res).
-add_list_plain(T, [H|L], S, Res):-  get_el(T, H, X), 
-                                    Sum is S + X, 
-                                    add_list_plain(T, L, Sum, Res).
- 
-mult_list_plain(T, [], Res, Res).
-mult_list_plain(T, [H|L], P, Res):- get_el(T, H, X), 
-                                    Prod is P * X, 
-                                    mult_list_plain(T, L, Prod, Res).
- 
-calc_plain(T, +(Res, List)):-   add_list_plain(T, List, 0, Res).
-calc_plain(T, *(Res, List)):-   mult_list_plain(T, List, 1, Res).
-calc_plain(T, /(Res, A, B)):-   get_el(T, A, X), 
-                                get_el(T, B, Y), 
-                                (Res is X // Y ; Res is Y // X).
 
-calc_plain(T, -(Res, A, B)):-   get_el(T, A, X), 
-                                get_el(T, B, Y), 
-                                (Res is X - Y ; Res is Y - X).
+sum_plain(T, [], Result, Result).
+sum_plain(T, [H|L], S, Result):-  get(T, H, X), 
+                                    Sum is S + X, 
+                                    sum_plain(T, L, Sum, Result).
+ 
+mult_list_plain(T, [], Result, Result).
+mult_list_plain(T, [H|L], P, Result):- get(T, H, X), 
+                                    Prod is P * X, 
+                                    mult_list_plain(T, L, Prod, Result).
+ 
+test_plain(T, +(Result, List)):-   sum_plain(T, List, 0, Result).
+test_plain(T, *(Result, List)):-   mult_list_plain(T, List, 1, Result).
+test_plain(T, /(Result, A, B)):-   get(T, A, X), 
+                                get(T, B, Y), 
+                                (Result is X // Y ; Result is Y // X).
+
+test_plain(T, -(Result, A, B)):-   get(T, A, X), 
+                                get(T, B, Y), 
+                                (Result is X - Y ; Result is Y - X).
  
 plain_kenken(N, C, T):- length(T, N), 
                         range(N, R), 
-                        iterate_all(row_len(N), T), 
+                        maplist(isOfLength(N), T), 
                         check_dom_plain(T, R), 
-                        trans(T, XTrans), 
-                        iterate_all(is_set, XTrans), 
-                        iterate_all(calc_plain(T), C), 
+                        transpose(T, X_t), 
+                        maplist(is_set, X_t), 
+                        maplist(test_plain(T), C), 
                         statistics.
  
