@@ -48,30 +48,41 @@ lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]):-
  
 % fdomain kenken implementation
  
-sum(T, [], Result, Result).
-sum(T, [Head|Tail], OldSum, Result):-   get(T, Head, E), 
-                                        NewSum #= OldSum + E, 
-                                        sum(T, Tail, NewSum, Result).
+product(X, Y, Product):- Product is X * Y.
  
-mult_list(T, [], Result, Result).
-mult_list(T, [Head|Tail], OldProduct, Result):- get(T, Head, E), 
-                                                NewProduct #= OldProduct * E, 
-                                                mult_list(T, Tail, NewProduct, Result).
-getValues(_, [], L).
-getValues(T, [Head|Tail], L):-  get(T, Head, Value),
-                                getValues(T, Tail, [Value|L]).
+reduce(_, [], FinalResult, FinalResult).
+reduce(Function, [Head|Tail], OldResult, FinalResult):-
+                        call(Function, Head, OldResult, NewResult),
+                        reduce(Function, Tail, NewResult, FinalResult).
+
+reduce_reduce_sum(T, [], Result, Result).
+reduce_reduce_sum(T, [Head|Tail], OldSum, Result):-   get(T, Head, E), 
+                                        Newreduce_sum #= OldSum + E, 
+                                        reduce_reduce_sum(T, Tail, NewSum, Result).
+ 
+reduce_product(T, [], Result, Result).
+reduce_product(T, [Head|Tail], OldProduct, Result):- 
+                                    get(T, Head, E), 
+                                    NewProduct #= OldProduct * E, 
+                                    reduce_product(T, Tail, NewProduct, Result).
+getValues(_, [], []).
+getValues(T, [Head|Tail], [Value|L]):-  get(T, Head, Value),
+                                        getValues(T, Tail, L).
  
 test(T, +(Result, List)):-  getValues(T, List, Z), 
-                            sum(T, List, 0, Result).
-test(T, *(Result, List)):- mult_list(T, List, 1, Result).
+                            reduce_reduce_sum(T, List, 0, Result).
 
-test(T, /(Result, A, B)):-  get(T, A, X), 
-                            get(T, B, Y), 
-                            (X * Result #= Y ; Y * Result #= X).
+test(T, *(Result, List)):-  getValues(T, List, Z), 
+                            % reduce(product, Z, 1, Result).
+                            reduce_product(T, List, 1, Result).
 
-test(T, -(Result, A, B)):-  get(T, A, X), 
-                            get(T, B, Y), 
-                            (Result #= X - Y ; Result #= Y - X).
+test(T, /(Result, CoordA, CoordB)):-    get(T, CoordA, A), 
+                                        get(T, CoordB, B), 
+                                        (A * Result #= B ; B * Result #= A).
+
+test(T, -(Result, CoordA, CoordB)):-    get(T, CoordA, A), 
+                                        get(T, CoordB, B), 
+                                        (Result #= A - B ; Result #= B - A).
  
 kenken(N, C, T):-   length(T, N), 
                     maplist(isOfLength(N), T),      % T isOfLength N
@@ -102,25 +113,25 @@ check_dom_plain([H|T], R):- check_doplain(H, R),
                             check_dom_plain(T, R).
  
 
-sum_plain(T, [], Result, Result).
-sum_plain(T, [H|L], S, Result):-  get(T, H, X), 
-                                    Sum is S + X, 
-                                    sum_plain(T, L, Sum, Result).
+reduce_reduce_sum_plain(T, [], Result, Result).
+reduce_reduce_sum_plain(T, [H|L], S, Result):-    get(T, H, X), 
+                                    reduce_sum is S + X, 
+                                    reduce_reduce_sum_plain(T, L, Sum, Result).
  
-mult_list_plain(T, [], Result, Result).
-mult_list_plain(T, [H|L], P, Result):- get(T, H, X), 
-                                    Prod is P * X, 
-                                    mult_list_plain(T, L, Prod, Result).
+reduce_product_plain(T, [], Result, Result).
+reduce_product_plain(T, [H|L], P, Result):- get(T, H, X), 
+                                            Prod is P * X, 
+                                            reduce_product_plain(T, L, Prod, Result).
  
-test_plain(T, +(Result, List)):-   sum_plain(T, List, 0, Result).
-test_plain(T, *(Result, List)):-   mult_list_plain(T, List, 1, Result).
-test_plain(T, /(Result, A, B)):-   get(T, A, X), 
-                                get(T, B, Y), 
-                                (Result is X // Y ; Result is Y // X).
+test_plain(T, +(Result, List)):-    reduce_reduce_sum_plain(T, List, 0, Result).
+test_plain(T, *(Result, List)):-    reduce_product_plain(T, List, 1, Result).
+test_plain(T, /(Result, CoordA, CoordB)):-  get(T, CoordA, A), 
+                                            get(T, CoordB, B), 
+                                            (Result is A // B ; Result is B // A).
 
-test_plain(T, -(Result, A, B)):-   get(T, A, X), 
-                                get(T, B, Y), 
-                                (Result is X - Y ; Result is Y - X).
+test_plain(T, -(Result, CoordA, CoordB)):-  get(T, CoordA, A), 
+                                            get(T, CoordB, B), 
+                                            (Result is A - B ; Result is B - A).
  
 plain_kenken(N, C, T):- length(T, N), 
                         range(N, R), 
