@@ -54,24 +54,26 @@ sum(T, [Head|Tail], OldSum, Result):-   get(T, Head, E),
                                         sum(T, Tail, NewSum, Result).
  
 mult_list(T, [], Result, Result).
-mult_list(T, [H|L], P, Result):-    get(T, H, X), 
-                                    Prod #= P * X, 
-                                    mult_list(T, L, Prod, Result).
+mult_list(T, [Head|Tail], OldProduct, Result):- get(T, Head, E), 
+                                                NewProduct #= OldProduct * E, 
+                                                mult_list(T, Tail, NewProduct, Result).
  
 test(T, +(Result, List)):- sum(T, List, 0, Result).
 test(T, *(Result, List)):- mult_list(T, List, 1, Result).
-test(T, /(Result, A, B)):- get(T, A, X), 
-                        get(T, B, Y), 
-                        (X * Result #= Y ; Y * Result #= X).
-test(T, -(Result, A, B)):- get(T, A, X), 
-                        get(T, B, Y), 
-                        (Result #= X - Y ; Result #= Y - X).
+
+test(T, /(Result, A, B)):-  get(T, A, X), 
+                            get(T, B, Y), 
+                            (X * Result #= Y ; Y * Result #= X).
+
+test(T, -(Result, A, B)):-  get(T, A, X), 
+                            get(T, B, Y), 
+                            (Result #= X - Y ; Result #= Y - X).
  
 kenken(N, C, T):-   length(T, N), 
                     maplist(isOfLength(N), T),      % T isOfLength N
                     maplist(rangesFrom1to(N), T),   % every row in T is 1 ... N
                     maplist(fd_all_different, T),   % and only has unique elements
-                    transpose(T, X_t),          % transpose the matrix
+                    transpose(T, X_t),              % transpose the matrix
                     maplist(fd_all_different, X_t), % and check for uniqueness
                     maplist(test(T), C),            % check each constraint
                     maplist(fd_labeling, T),        %
