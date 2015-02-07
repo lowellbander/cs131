@@ -47,31 +47,46 @@ lists_firsts_rests([[F|Os]|Rest], [F|Fs], [Os|Oss]):-
                                     lists_firsts_rests(Rest, Fs, Oss).
  
 % fdomain kenken implementation
- 
+
+% product(X, Y, Product):- Product is X * Y.
+% 
+% reduce(_, [], FinalResult, FinalResult).
+% reduce(Function, [Head|Tail], OldResult, FinalResult):-
+%                         call(Function, Head, OldResult, NewResult),
+%                         reduce(Function, Tail, NewResult, FinalResult).
+
+% given a list, of coordinates, return a list of values at those coords
+% // does this preserve order? //
+% getValues(_, [], _).
+% getValues(T, [Head|Tail], L):-  get(T, Head, Value),
+%                                 append([Value], L, NewL),
+%                                 getValues(T, Tail, NewL).
+
+test(T, +(Result, List)):- sum(T, List, 0, Result).
 sum(T, [], Result, Result).
 sum(T, [Head|Tail], OldSum, Result):-   get(T, Head, E), 
                                         NewSum #= OldSum + E, 
                                         sum(T, Tail, NewSum, Result).
  
-mult_list(T, [], Result, Result).
-mult_list(T, [H|L], P, Result):-    get(T, H, X), 
-                                    Prod #= P * X, 
-                                    mult_list(T, L, Prod, Result).
- 
-test(T, +(Result, List)):- sum(T, List, 0, Result).
 test(T, *(Result, List)):- mult_list(T, List, 1, Result).
-test(T, /(Result, A, B)):- get(T, A, X), 
-                        get(T, B, Y), 
-                        (X * Result #= Y ; Y * Result #= X).
-test(T, -(Result, A, B)):- get(T, A, X), 
-                        get(T, B, Y), 
-                        (Result #= X - Y ; Result #= Y - X).
+mult_list(T, [], Result, Result).
+mult_list(T, [Head|Tail], OldProduct, Result):- get(T, Head, E), 
+                                                NewProuct #= OldProduct * E, 
+                                                mult_list(T, L, NewProuct, Result).
+ 
+test(T, /(Result, A, B)):-  get(T, A, X), 
+                            get(T, B, Y), 
+                            (X * Result #= Y ; Y * Result #= X).
+
+test(T, -(Result, A, B)):-  get(T, A, X), 
+                            get(T, B, Y), 
+                            (Result #= X - Y ; Result #= Y - X).
  
 kenken(N, C, T):-   length(T, N), 
                     maplist(isOfLength(N), T),      % T isOfLength N
                     maplist(rangesFrom1to(N), T),   % every row in T is 1 ... N
                     maplist(fd_all_different, T),   % and only has unique elements
-                    transpose(T, X_t),          % transpose the matrix
+                    transpose(T, X_t),              % transpose the matrix
                     maplist(fd_all_different, X_t), % and check for uniqueness
                     maplist(test(T), C),            % check each constraint
                     maplist(fd_labeling, T),        %
