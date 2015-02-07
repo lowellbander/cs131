@@ -78,7 +78,7 @@ test(T, *(Result, List)):-  getValues(T, List, Z),
 
 test(T, /(Result, CoordA, CoordB)):-    get(T, CoordA, A), 
                                         get(T, CoordB, B), 
-                                        (A * Result #= B ; B * Result #= A).
+                                        (Result #= A // B; Result #= B // A).
 
 test(T, -(Result, CoordA, CoordB)):-    get(T, CoordA, A), 
                                         get(T, CoordB, B), 
@@ -92,7 +92,6 @@ kenken(N, C, T):-   length(T, N),
                     maplist(fd_all_different, X_t), % and check for uniqueness
                     maplist(test(T), C),            % check each constraint
                     maplist(fd_labeling, T),        %
-                    % statistics.
                     true.
  
 % plain kenken implementation
@@ -100,28 +99,28 @@ kenken(N, C, T):-   length(T, N),
 range(N, L):-   findall(X, between(1, N, X), L).
  
 check_doplain([], _).
-check_doplain([H|T], R):-   member(H, R), 
+check_doplain([Head|T], R):-   member(Head, R), 
                             check_doplain(T, R).
  
-is_set(L):- setof(X, member(X, L), S), 
+set(L):- setof(X, member(X, L), S), 
             length(L, N), 
             length(S, N).
  
 check_dom_plain([], _).
-check_dom_plain([H|T], R):- check_doplain(H, R), 
-                            is_set(H), 
+check_dom_plain([Head|T], R):- check_doplain(Head, R), 
+                            set(Head), 
                             check_dom_plain(T, R).
  
 
 reduce_reduce_sum_plain(T, [], Result, Result).
-reduce_reduce_sum_plain(T, [H|L], S, Result):-    get(T, H, X), 
+reduce_reduce_sum_plain(T, [Head|Tail], S, Result):-    get(T, Head, X), 
                                     reduce_sum is S + X, 
-                                    reduce_reduce_sum_plain(T, L, Sum, Result).
+                                    reduce_reduce_sum_plain(T, Tail, Sum, Result).
  
 reduce_product_plain(T, [], Result, Result).
-reduce_product_plain(T, [H|L], P, Result):- get(T, H, X), 
+reduce_product_plain(T, [Head|Tail], P, Result):- get(T, Head, X), 
                                             Prod is P * X, 
-                                            reduce_product_plain(T, L, Prod, Result).
+                                            reduce_product_plain(T, Tail, Prod, Result).
  
 test_plain(T, +(Result, List)):-    reduce_reduce_sum_plain(T, List, 0, Result).
 test_plain(T, *(Result, List)):-    reduce_product_plain(T, List, 1, Result).
@@ -138,7 +137,7 @@ plain_kenken(N, C, T):- length(T, N),
                         maplist(isOfLength(N), T), 
                         check_dom_plain(T, R), 
                         transpose(T, X_t), 
-                        maplist(is_set, X_t), 
+                        maplist(set, X_t), 
                         maplist(test_plain(T), C), 
                         statistics.
  
