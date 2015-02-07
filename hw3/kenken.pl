@@ -57,8 +57,12 @@ mult_list(T, [], Result, Result).
 mult_list(T, [Head|Tail], OldProduct, Result):- get(T, Head, E), 
                                                 NewProduct #= OldProduct * E, 
                                                 mult_list(T, Tail, NewProduct, Result).
+getValues(_, [], L).
+getValues(T, [Head|Tail], L):-  get(T, Head, Value),
+                                getValues(T, Tail, [Value|L]).
  
-test(T, +(Result, List)):- sum(T, List, 0, Result).
+test(T, +(Result, List)):-  getValues(T, List, Z), 
+                            sum(T, List, 0, Result).
 test(T, *(Result, List)):- mult_list(T, List, 1, Result).
 
 test(T, /(Result, A, B)):-  get(T, A, X), 
