@@ -5,7 +5,14 @@
 \title{Homework \#4 Report}
 \author{Lowell Bander}
 \maketitle
+%\tableofcontents
 
-Content
+\section{Testing Platform}
+\subsection{Java Version}
+The testing harness was run on Java version 1.8.0\_31.\\
+\subsection{Verifying Reliability}
+To test the reliability of the Null- and SynchronizedState models, I ensure that the initial sum of values was equal to the final sum of values. I also checked that each value was within range; that is, greater than or equal to the minimum and less than or equal to the maximum possible value.\\
+
+When the harness \texttt{UnsafeMemory} is run, the initial and final sums of the values in the model will be printed out, as well as a message indicating whether the two values differ. Upon success, \texttt{Sum remained constant!} will be printed to the screen.
 
 \end{document}

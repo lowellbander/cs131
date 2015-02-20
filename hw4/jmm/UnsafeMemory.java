@@ -33,6 +33,15 @@ class UnsafeMemory {
 	    System.exit (1);
     }
 
+    private static int sum(byte[] bytes) {
+       int s = 0; 
+    
+       for (int i = 0; i < bytes.length; ++i)
+           s += bytes[i]; // TODO: needs conversion to int?
+
+       return s;
+    }
+
     private static int parseInt(String s, int min, int max) {
 	    int n = Integer.parseInt(s);
 	    if (n < min || n > max)
@@ -49,6 +58,9 @@ class UnsafeMemory {
 	    	     + (i < nTransitions % nThreads ? 1 : 0));
 	        t[i] = new Thread (new SwapTest (threadTransitions, s));
 	    }
+
+        int initialSum = sum(s.current());
+
 	    long start = System.nanoTime();
 	    for (int i = 0; i < nThreads; i++)
 	        t[i].start ();
@@ -59,11 +71,22 @@ class UnsafeMemory {
 	    System.out.format("Threads average %g ns/transition\n",
 			  elapsed_ns * nThreads / nTransitions);
 
+        // test reliability
+        
+        int finalSum = sum(s.current());
+
+        System.out.println("Initial sum is " + initialSum);
+        System.out.println("Final sum is " + finalSum);
+        if (initialSum == finalSum)
+            System.out.println("Sum remained constant!");
+        else
+            System.out.println("UNRELIABLE: Sum changed!");
+
+
         System.out.println("Done working.");
 
         // TODO: ensure that Null and Synchronized methods are 100% reliable
         // TODO: ensure no value is less than min or greater than max
-        // TODO: ensure initial sum == final sum2
     }
 
     private static void test(byte[] input, byte[] output, byte maxval) {
