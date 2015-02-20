@@ -42,6 +42,21 @@ class UnsafeMemory {
        return s;
     }
 
+    private static Boolean allWithinRange(byte[] bytes/*, int min, int max*/) {
+        // TODO: shouldn't I be checking for what the min/max values are in this
+        // case?
+
+        byte maxval = 127;
+
+        for (int i = 0; i < bytes.length; ++i) {
+            byte b = bytes[i];
+            if (b < 0 || b > maxval)
+                return false;
+        }
+
+        return true;
+    }
+
     private static int parseInt(String s, int min, int max) {
 	    int n = Integer.parseInt(s);
 	    if (n < min || n > max)
@@ -82,11 +97,10 @@ class UnsafeMemory {
         else
             System.out.println("UNRELIABLE: Sum changed!");
 
-
-        System.out.println("Done working.");
-
-        // TODO: ensure that Null and Synchronized methods are 100% reliable
-        // TODO: ensure no value is less than min or greater than max
+        if (allWithinRange(s.current()))
+            System.out.println("All within range!");
+        else
+            System.out.println("UNRELIABLE: Value not within range.");
     }
 
     private static void test(byte[] input, byte[] output, byte maxval) {
