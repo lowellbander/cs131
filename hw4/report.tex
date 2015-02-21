@@ -21,4 +21,11 @@ Similarly, the test harness will print \texttt{All within range!} if every value
 The \texttt{Unsynchronized} model is the same as its \texttt{Synchronized} counterpart, except that it does not use the \texttt{Synchronized} keyword. Accordingly, there are occasionally disparities in the initial final sum of values.
 \subsection{GetNSet}
 This  new model is similar to the above model, except that its internal state is represented by an \texttt{AtomicIntegerArray} and uses the \texttt{get} and \texttt{set} methods associated with this class to modify the contents of the model.
+\subsection{BetterSafe}
+This model is identical to the \texttt{Unsynchronized} model except that the body of the \texttt{swap()} function is locked by a single \texttt{ReentrantLock} that is shared by the entire model. It is counterintuitive that this would improve performance, and the only explanation I can think of is that making the body of a function synchronous instead of the entire function somehow reduces overhead.\\
+
+The model is still 100\% reliable because the \texttt{ReentrantLock} ensures that only a single thread is modifying the data at a time.\\
+
+When run with a \texttt{maxval} of 127 on 20 threads and 999,999 transitions, \texttt{BetterSafe} often outperforms \texttt{Synchronized} by 200-600 ns/transition.
+\subsection{BetterSorry}
 \end{document}

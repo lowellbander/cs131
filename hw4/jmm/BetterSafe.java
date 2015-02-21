@@ -1,6 +1,8 @@
+import java.util.concurrent.locks.ReentrantLock;
 class BetterSafe implements State {
     private byte[] value;
     private byte maxval;
+    private final ReentrantLock lock = new ReentrantLock();
 
     BetterSafe(byte[] v) { value = v; maxval = 127; }
 
@@ -11,11 +13,17 @@ class BetterSafe implements State {
     public byte[] current() { return value; }
 
     public boolean swap(int i, int j) {
-	    if (value[i] <= 0 || value[j] >= maxval)
-	        return false;
+        lock.lock();
+        try {
+            if (value[i] <= 0 || value[j] >= maxval)
+	            return false;
 	
-	    value[i]--;
-	    value[j]++;
-	    return true;
+	        value[i]--;
+	        value[j]++;
+	        return true;
+
+        } finally {
+            lock.unlock();
+        }
     }
 }
