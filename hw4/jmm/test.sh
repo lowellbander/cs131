@@ -12,4 +12,6 @@ echo "Running Unsynchronized test"
 java UnsafeMemory Unsynchronized $nthreads $ntransitions 10 1 2 3 4 5
 echo "Running GetNSet test"
 java UnsafeMemory GetNSet $nthreads $ntransitions 10 1 2 3 4 5
+echo "Running BetterSafe test"
+java UnsafeMemory BetterSafe $nthreads $ntransitions 10 1 2 3 4 5
 ) && bash clean.sh
