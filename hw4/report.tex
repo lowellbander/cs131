@@ -1,11 +1,14 @@
 \documentclass[]{article}
-
+\usepackage[margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{cleveref}
+\crefname{section}{§}{§§}
+\Crefname{section}{§}{§§}
 \begin{document}
 
 \title{Homework \#4 Report}
 \author{Lowell Bander}
 \maketitle
-%\tableofcontents
 
 \section{Testing Platform}
 \subsection{Java Version}
@@ -18,9 +21,14 @@ When the harness \texttt{UnsafeMemory} is run, the initial and final sums of the
 Similarly, the test harness will print \texttt{All within range!} if every value in the state model is within range at the end of the simulation.
 \section{New Models}
 \subsection{Unsynchronized}
-The \texttt{Unsynchronized} model is the same as its \texttt{Synchronized} counterpart, except that it does not use the \texttt{Synchronized} keyword. Accordingly, there are occasionally disparities in the initial final sum of values.
+\label{sec:unsync}
+The \texttt{Unsynchronized} model is the same as its \texttt{Synchronized} counterpart, except that it does not use the \texttt{Synchronized} keyword. Accordingly, there are occasionally disparities in the initial final sum of values.\\
+
+When run with more than 10,000 transitions, simulation using this model may run very long or infinitely. This model is not DRF due to the reason in \cref{subsec:drf} and is especially likely to fail when given large values for \texttt{nthreads} and \texttt{ntransitions}, such as \texttt{java UnsafeMemory Unsynchronized 25 9999 127 1 2 3 4 5}. 
 \subsection{GetNSet}
-This  new model is similar to the above model, except that its internal state is represented by an \texttt{AtomicIntegerArray} and uses the \texttt{get} and \texttt{set} methods associated with this class to modify the contents of the model.
+This  new model is similar to the above model, except that its internal state is represented by an \texttt{AtomicIntegerArray} and uses the \texttt{get} and \texttt{set} methods associated with this class to modify the contents of the model.\\
+
+When run with more than 10,000 transitions, simulation using this model may run very long or infinitely. Not DRF for the same reason in \cref{sec:unsync}.
 \subsection{BetterSafe}
 This model is identical to the \texttt{Unsynchronized} model except that the body of the \texttt{swap()} function is locked by a single \texttt{ReentrantLock} that is shared by the entire model. It is counterintuitive that this would improve performance, and the only explanation I can think of is that making the body of a function synchronous instead of the entire function somehow reduces overhead.\\
 
@@ -28,4 +36,18 @@ The model is still 100\% reliable because the \texttt{ReentrantLock} ensures tha
 
 When run with a \texttt{maxval} of 127 on 20 threads and 999,999 transitions, \texttt{BetterSafe} often outperforms \texttt{Synchronized} by 200-600 ns/transition.
 \subsection{BetterSorry}
+When run with a \texttt{maxval} of 127 on 20 threads and 999,999 transitions, \texttt{BetterSorry} occasionally outperforms \texttt{BetterSafe} by 200-400 ns/transition.\\
+
+This model uses the atomic \texttt{getAndIncrement()} and \texttt{getAndDecrement()} methods of \texttt{AtomicIntegerArray} to make changes to the model. This implementation is faster than \texttt{BetterSafe} because operations are allowed to interleave, thereby having improved performance when contrasted with \texttt{BetterSafe} which locks the entire body of the \texttt{swap()} function.\\
+
+This model is more reliable than \texttt{Unsynchronized} because by replacing the standard increment and decrement methods by their atomic counterparts, we are eliminating the possibility for race conditions to occur, at least for this part of the code.
+\subsubsection{Race Condition Vulnerability}
+\label{subsec:drf}
+This model still suffers from race conditions (is not DRF). For example, if two values are to be swapped and both have a value of \texttt{maxval - 1}, separate threads might both check and see that the values can be incremented. However, incrementing the value twice, once within each thread, means the value will no longer be within range.\\
+
+This race condition will occur with higher probability when the number of concurrently running threads is higher. 
+
+\section{Conclusion}
+Given that GDI is more concerned with speed than slight error, they may opt for the the \texttt{BetterSorry} model which may certainly not be completely reliable, but runs much faster than synchronous code.
+
 \end{document}
