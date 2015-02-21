@@ -5,7 +5,7 @@
 \title{Homework \#4 Report}
 \author{Lowell Bander}
 \maketitle
-%\tableofcontents
+\tableofcontents
 
 \section{Testing Platform}
 \subsection{Java Version}
@@ -16,5 +16,7 @@ To test the reliability of the Null- and SynchronizedState models, I ensure that
 When the harness \texttt{UnsafeMemory} is run, the initial and final sums of the values in the model will be printed out, as well as a message indicating whether the two values differ. Upon success, \texttt{Sum remained constant!} will be printed to the screen.\\
 
 Similarly, the test harness will print \texttt{All within range!} if every value in the state model is within range at the end of the simulation.
-
+\section{New Models}
+\subsection{Unsynchronized}
+The \texttt{Unsynchronized} model is the same as its \texttt{Synchronized} counterpart, except that it does not use the \texttt{Synchronized} keyword. Accordingly, there are occasionally disparities in the initial final sum of values.
 \end{document}
