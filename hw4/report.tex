@@ -5,7 +5,7 @@
 \title{Homework \#4 Report}
 \author{Lowell Bander}
 \maketitle
-\tableofcontents
+%\tableofcontents
 
 \section{Testing Platform}
 \subsection{Java Version}
@@ -19,4 +19,6 @@ Similarly, the test harness will print \texttt{All within range!} if every value
 \section{New Models}
 \subsection{Unsynchronized}
 The \texttt{Unsynchronized} model is the same as its \texttt{Synchronized} counterpart, except that it does not use the \texttt{Synchronized} keyword. Accordingly, there are occasionally disparities in the initial final sum of values.
+\subsection{GetNSet}
+This  new model is similar to the above model, except that its internal state is represented by an \texttt{AtomicIntegerArray} and uses the \texttt{get} and \texttt{set} methods associated with this class to modify the contents of the model.
 \end{document}
