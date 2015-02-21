@@ -4,7 +4,7 @@ class GetNSet implements State {
     private AtomicIntegerArray atomic_value;
     private byte maxval;
 
-    /* given an array of bytes, returns an AtomicIntegerArray*/
+    /* given an array of bytes, returns an AtomicIntegerArray */
     private AtomicIntegerArray aiaFromBytes(byte[] v) {
         AtomicIntegerArray a = new AtomicIntegerArray(v.length);
         for (int i = 0; i < v.length; ++i) a.set(i, (int)v[i]);
