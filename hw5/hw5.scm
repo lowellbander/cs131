@@ -1,4 +1,7 @@
-; right now, just the solution to the alternate hw2
+
+(define (accept frag)
+  (call/cc (lambda (cc)
+    (cons frag (lambda () (cc #f))))))
 
 (define match-junk
   (lambda (k frag accept)
@@ -15,7 +18,7 @@
 		   (and (not (eq? frag frag1))
 			(match-* matcher frag1 accept)))))))
 
-(define make-matcher
+(define make-matcher-rec
   (lambda (pat)
     (cond
 
@@ -29,7 +32,7 @@
       (let make-or-matcher ((pats (cdr pat)))
 	(if (null? pats)
 	    (lambda (frag accept) #f)
-	    (let ((head-matcher (make-matcher (car pats)))
+	    (let ((head-matcher (make-matcher-rec (car pats)))
 		  (tail-matcher (make-or-matcher (cdr pats))))
 	      (lambda (frag accept)
 		(or (head-matcher frag accept)
@@ -39,7 +42,7 @@
       (let make-list-matcher ((pats (cdr pat)))
 	(if (null? pats)
 	    (lambda (frag accept) (accept frag))
-	    (let ((head-matcher (make-matcher (car pats)))
+	    (let ((head-matcher (make-matcher-rec (car pats)))
 		  (tail-matcher (make-list-matcher (cdr pats))))
 	      (lambda (frag accept)
 		(head-matcher frag
@@ -52,6 +55,10 @@
 	  (match-junk k frag accept))))
 
      ((eq? '* (car pat))
-      (let ((matcher (make-matcher (cadr pat))))
+      (let ((matcher (make-matcher-rec (cadr pat))))
 	(lambda (frag accept)
 	  (match-* matcher frag accept)))))))
+
+(define (make-matcher pat) 
+  (lambda (frag)
+    ((make-matcher-rec pat) frag accept)))

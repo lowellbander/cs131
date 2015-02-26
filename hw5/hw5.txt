@@ -1,0 +1,6 @@
+This solution uses a custom accept function which calls the continuation on
+the fragment if the match is successful.
+
+By adding the accept function, I defined a new make-matcher function which uses
+the existing one to determine whether to call the redefined acceptor as a
+continuation.
