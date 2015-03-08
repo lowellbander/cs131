@@ -2,14 +2,16 @@ import sys
 from twisted.internet import protocol, reactor, endpoints
 
 # simplest possible protocol
-class Echo(protocol.Protocol):
+# an instance created per connection
+class EchoProtocol(protocol.Protocol):
     def dataReceived(self, data):
         # upon receipt of data, echo.
         self.transport.write(data)
 
+# this is where persistent configuration should be kept
 class EchoFactory(protocol.Factory):
     def buildProtocol(self, addr):
-        return Echo()
+        return EchoProtocol()
 
 def usage():
     print "usage: ", sys.argv[0],  " <servername> <port>"
@@ -21,11 +23,11 @@ def main():
         return
     
     servername = sys.argv[1]
-    port = sys.argv[2]
+    port = int(sys.argv[2])
 
     factory = protocol.ServerFactory()
-    factory.protocol = Echo
-    reactor.listenTCP(int(port), factory)
+    factory.protocol = EchoProtocol
+    reactor.listenTCP(port, factory)
     reactor.run()
 
 # only runs if module wasn't imported
