@@ -13,8 +13,17 @@ class HerdAnimalProtocol(Protocol):
         # self.transport.write("A connection was made. " + 
         # "There are currently %d open connections" % self.factory.numProtocols)
 
+    def badInput(self, message):
+        self.transport.write("? " + message)
+
     def dataReceived(self, data):
-        # upon receipt of data, echo.
+        
+        fields = data.split()
+
+        if len(fields) != 4:
+            self.badInput(data)
+            return
+
         self.transport.write(self.factory.servername + data)
 
 # this is where persistent configuration should be kept
