@@ -1,11 +1,13 @@
 import sys
 from twisted.internet import reactor, protocol
 
-class EchoClient(protocol.Protocol):
+class ClientProtocol(protocol.Protocol):
     # once connected, send a message, then print the result
 
     def connectionMade(self):
-        self.transport.write("this is the message sent by the client")
+        #self.transport.write("IAMAT kiwi.cs.ucla.edu +34.068930-118.445127"+
+        #                                    " 1400794645.392014450")
+        self.transport.write(self.factory.message)
 
     def dataReceived(self, data):
         # upon receipt of data, print it and close connection
@@ -15,8 +17,11 @@ class EchoClient(protocol.Protocol):
     def connectionLost(self, reason):
         print "The connection to the server was lost"
 
-class EchoFactory(protocol.ClientFactory):
-    protocol = EchoClient
+class ClientFactory(protocol.ClientFactory):
+    protocol = ClientProtocol
+
+    def __init__(self, message):
+        self.message = message
 
     def clientConnectionFailed(self, connector, reason):
         print "The connection to the server failed"
@@ -24,21 +29,21 @@ class EchoFactory(protocol.ClientFactory):
 
     def clientConnectionLost(self, connector, reason):
         print "The connection to the server was lost"
-        #self.factory.numProtocols -= 1
         reactor.stop()
 
 def usage():
-    print "usage: ", sys.argv[0], " <port>"
+    print "usage: ", sys.argv[0], " <port> <message>"
 
 def main():
     
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3:
         usage()
         return
 
     port = int(sys.argv[1])
+    message = sys.argv[2]
 
-    factory = EchoFactory()
+    factory = ClientFactory(message)
     reactor.connectTCP("localhost", port, factory)
     reactor.run()
 

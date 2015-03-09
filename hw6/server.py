@@ -5,7 +5,7 @@ from twisted.internet.protocol import Protocol, Factory, ServerFactory
 
 # simplest possible protocol
 # an instance created per connection
-class EchoProtocol(Protocol):
+class HerdAnimalProtocol(Protocol):
 
     def connectionMade(self):
         print "A connection was made to a client"
@@ -18,9 +18,9 @@ class EchoProtocol(Protocol):
         self.transport.write(self.factory.servername + data)
 
 # this is where persistent configuration should be kept
-class EchoFactory(Factory):
+class HerdAnimalFactory(Factory):
 
-    protocol = EchoProtocol
+    protocol = HerdAnimalProtocol
 
     def __init__(self, servername):
         self.servername = servername
@@ -38,7 +38,7 @@ def main():
     port = int(sys.argv[2])
 
     endpoint = TCP4ServerEndpoint(reactor, port)
-    endpoint.listen(EchoFactory(servername))
+    endpoint.listen(HerdAnimalFactory(servername))
     reactor.run()
 
 # only runs if module wasn't imported
