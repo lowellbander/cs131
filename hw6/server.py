@@ -24,7 +24,17 @@ class HerdAnimalProtocol(Protocol):
             self.badInput(data)
             return
 
-        self.transport.write(self.factory.servername + data)
+        command = fields[0]
+        clientID = fields[1]
+        location = fields[2]
+        timestamp = fields[3]
+
+        if command == "IAMAT":
+            self.transport.write("Not yet implemented")
+        elif command == "WHATSAT":
+            self.transport.write("Not yet implemented")
+        else:
+            self.badInput(data)
 
 # this is where persistent configuration should be kept
 class HerdAnimalFactory(Factory):
