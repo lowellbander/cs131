@@ -1,3 +1,4 @@
+import sys
 from twisted.internet import reactor, protocol
 
 class EchoClient(protocol.Protocol):
@@ -25,9 +26,19 @@ class EchoFactory(protocol.ClientFactory):
         print "The connection to the server was lost"
         reactor.stop()
 
+def usage():
+    print "usage: ", sys.argv[0], " <port>"
+
 def main():
+    
+    if len(sys.argv) != 2:
+        usage()
+        return
+
+    port = int(sys.argv[1])
+
     factory = EchoFactory()
-    reactor.connectTCP("localhost", 8000, factory)
+    reactor.connectTCP("localhost", port, factory)
     reactor.run()
 
 # only runs if module not imported
