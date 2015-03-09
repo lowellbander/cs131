@@ -24,6 +24,7 @@ class EchoFactory(protocol.ClientFactory):
 
     def clientConnectionLost(self, connector, reason):
         print "The connection to the server was lost"
+        #self.factory.numProtocols -= 1
         reactor.stop()
 
 def usage():
