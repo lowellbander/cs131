@@ -11,7 +11,8 @@ class ClientProtocol(protocol.Protocol):
 
     def dataReceived(self, data):
         # upon receipt of data, print it and close connection
-        print "Server said: ", data
+        #print "Server said: ", data
+        print data
         self.transport.loseConnection()
 
     def connectionLost(self, reason):

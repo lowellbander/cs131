@@ -6,3 +6,4 @@ python client.py $PORT "WHOIS kiwi.cs.ucla.edu +34.068930-118.445127 1400794645.
 
 #normal
 python client.py $PORT "IAMAT kiwi.cs.ucla.edu +34.068930-118.445127 `date +%s`"
+python client.py $PORT "WHATSAT kiwi.cs.ucla.edu 10 5"

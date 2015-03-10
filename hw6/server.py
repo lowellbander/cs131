@@ -1,10 +1,14 @@
+import re
 import sys
+import urllib
 from datetime import datetime
 from datetime import timedelta
 from time import mktime
 from twisted.internet import reactor, endpoints
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from twisted.internet.protocol import Protocol, Factory, ServerFactory
+
+API_KEY = "AIzaSyCZuO6vfdPZXln8xsUr20PnjbY89FuFcWw"
 
 # simplest possible protocol
 # an instance created per connection
@@ -31,27 +35,46 @@ class HerdAnimalProtocol(Protocol):
         clientID = fields[1]
         location = fields[2]
         
-        try: 
-            timestamp = datetime.fromtimestamp(float(fields[3]))
-        except TypeError:
-            self.badInput(data)
-            return
-
-        delta = datetime.now() - timestamp
-        if delta >= timedelta():
-            delta = '+' + str(delta.total_seconds())
-        else:
-            delta = '-' + str(delta.total_seconds())
 
         if command == "IAMAT":
+            try: 
+                timestamp = datetime.fromtimestamp(float(fields[3]))
+            except TypeError:
+                self.badInput(data)
+                return
+
+            delta = datetime.now() - timestamp
+            if delta >= timedelta():
+                delta = '+' + str(delta.total_seconds())
+            else:
+                delta = '-' + str(delta.total_seconds())
             sequence = ('AT', self.factory.servername, delta, clientID, \
-                    location, timestamp)
+                                                        location, timestamp)
 
             self.transport.write(' '.join([str(s) for s in sequence]))
         elif command == "WHATSAT":
-            self.transport.write("Not yet implemented")
+            baseURL="https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+            location = '+34.068930-118.445127'
+            location = fix_location(location)
+            parameters = {
+                'key' : API_KEY,
+                'location' : location,
+                'radius' : 5,
+            }
+            print baseURL + urllib.urlencode(parameters)
+
+            self.transport.write("WHATSAT not yet implemented")
         else:
             self.badInput(data)
+
+def fix_location(location):
+    """ puts a comma between lat and lon, removes +'s """
+    latlon = re.split('([+-])', location)
+    latlon.remove('')
+    latlon[2:2] = ','
+    latlonCorrected = [part for part in latlon if part != '+']
+    locationCorrected = ''.join(latlonCorrected)
+    return locationCorrected
 
 # this is where persistent configuration should be kept
 class HerdAnimalFactory(Factory):
