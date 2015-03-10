@@ -4,11 +4,14 @@ import urllib
 from datetime import datetime
 from datetime import timedelta
 from time import mktime
+from twisted.web.client import Agent
+from twisted.web.http_headers import Headers
 from twisted.internet import reactor, endpoints
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from twisted.internet.protocol import Protocol, Factory, ServerFactory
 
 API_KEY = "AIzaSyCZuO6vfdPZXln8xsUr20PnjbY89FuFcWw"
+agent = Agent(reactor)
 
 # simplest possible protocol
 # an instance created per connection
@@ -61,11 +64,44 @@ class HerdAnimalProtocol(Protocol):
                 'location' : location,
                 'radius' : 5,
             }
-            print baseURL + urllib.urlencode(parameters)
+            #url = baseURL + urllib.urlencode(parameters)
+            #agent = Agent(reactor)
+            #d = agent.request(
+            #    'GET',
+            #    'http://google.com/',
+            #    Headers({'User-Agent': ['Twisted Web Client Example']}),
+            #    None)
+            #d.addCallback(self.placesResponded)
+            #d.addCallback(foo)
 
+            doRequest()
+            d = agent.request(
+                'GET',
+                'http://example.com/',
+                Headers({'User-Agent': ['Twisted Web Client Example']}),
+                None)
+            d.addCallback(lambda x : self.placesResponded(x))
             self.transport.write("WHATSAT not yet implemented")
         else:
             self.badInput(data)
+
+    def placesResponded(self, x):
+        print "places responded"
+
+def cbResponse(ignored):
+    print 'basic response received'
+
+def doRequest():
+    d = agent.request(
+        'GET',
+        'http://example.com/',
+        Headers({'User-Agent': ['Twisted Web Client Example']}),
+        None)
+    d.addCallback(cbResponse)
+    #d.addCallback(HerdAnimalProtocol.placesResponded)
+
+def foo():
+    print "foooooo"
 
 def fix_location(location):
     """ puts a comma between lat and lon, removes +'s """
