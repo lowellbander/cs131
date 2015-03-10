@@ -1,0 +1,47 @@
+\documentclass[letterpaper,twocolumn,10pt]{article}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\begin{document}
+
+\date{}
+
+\title{\Large \bf Application Server Herds in Twisted}
+
+\author{
+{\rm Lowell Bander} \\
+University of California, Los Angeles
+}
+
+\maketitle
+
+\begin{abstract}
+The aim of this paper is to evaluate web application frameworks which must support frequent updates and multiple simultaneous users. The core focus of our evaluation is Twisted, an event-driven framework written in Python. For demonstration purposes, we created an application which manages a server-herd and handles the aforementioned situations.
+\end{abstract}
+
+\section{Introduction}
+A LAMP (Linux, Apache, MySQL, PHP) stack uses multiple redundant web servers behind load-balancing virtual routers. This provides reliability and performance, but serves as a bottleneck for applications which receive frequent requests from mobile clients. This paper evaluates the Twisted framework's ability to meet this demand. Specifically, we are concerned with how maintainable and reliable those applications will be, and how extensible these applications written in Twisted are.
+
+\section{Twisted Framework}
+Twisted supports many protocols and implements callbacks for asynchronous event handling. Though these features are essential to the web application in question, their syntax is somewhat orthogonal to the sequential, blocking nature of Python.
+
+\section{Python}
+Python supports many programing paradigms. Being object-oriented, Python supports conventions such as passing functions as objects, class hierarchies, recursion, and anonymous lambda functions. It uses reference counting for memory management. Lastly, Python uses dynamic typing, so variables with the same name may change type during execution of the program.
+
+\section{NodeJS}
+NodeJS is a Javascript framework which takes advantage of Javascript's async programming style to allow for non-blocking programming. This makes it easy to write programs which wait for input as a prerequisite to actions such as function calls.
+
+\section{Javascript}
+In contrast to languages such as Java and Python, Javascript uses prototyping instead of classes. Accordingly, inheritance is achieved by cloning existing objects. It uses dynamic, weak types. Unlike Python, Javascript programmers must manage their own memory.
+
+\section{Comparison of Twisted and Node}
+NodeJS inherently uses callbacks, whereas Twisted uses promises, which allows you to separate control flow, whereas callbacks are more continuation passing style.
+
+\section{Evaluation}
+Node's extensive documentation and functional style make developing protocols, servers, and clients for the application in question far easier than in Twisted.
+\section{References}
+[1]http://programmers.stackexchange.com/questions/107950/differences-between-javascript-and-python \newline
+[2]http://nodejs.org/about/ \newline
+[3]https://developer.mozilla.org/en-US/docs/JavaScript \newline
+[4]http://stackoverflow.com/questions/5458631/whats-so-cool-about-twisted \newline
+
+\end{document}
