@@ -42,15 +42,12 @@ class HerdAnimalProtocol(Protocol):
             delta = '+' + str(delta.total_seconds())
         else:
             delta = '-' + str(delta.total_seconds())
-        print delta
 
         if command == "IAMAT":
             sequence = ('AT', self.factory.servername, delta, clientID, \
                     location, timestamp)
 
             self.transport.write(' '.join([str(s) for s in sequence]))
-            #self.transport.write('AT ' + servername + ' ')
-            #self.transport.write("Not yet implemented")
         elif command == "WHATSAT":
             self.transport.write("Not yet implemented")
         else:
