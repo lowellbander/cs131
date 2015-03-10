@@ -1,4 +1,7 @@
 import sys
+from datetime import datetime
+from datetime import timedelta
+from time import mktime
 from twisted.internet import reactor, endpoints
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from twisted.internet.protocol import Protocol, Factory, ServerFactory
@@ -27,10 +30,27 @@ class HerdAnimalProtocol(Protocol):
         command = fields[0]
         clientID = fields[1]
         location = fields[2]
-        timestamp = fields[3]
+        
+        try: 
+            timestamp = datetime.fromtimestamp(float(fields[3]))
+        except TypeError:
+            self.badInput(data)
+            return
+
+        delta = datetime.now() - timestamp
+        if delta >= timedelta():
+            delta = '+' + str(delta.total_seconds())
+        else:
+            delta = '-' + str(delta.total_seconds())
+        print delta
 
         if command == "IAMAT":
-            self.transport.write("Not yet implemented")
+            sequence = ('AT', self.factory.servername, delta, clientID, \
+                    location, timestamp)
+
+            self.transport.write(' '.join([str(s) for s in sequence]))
+            #self.transport.write('AT ' + servername + ' ')
+            #self.transport.write("Not yet implemented")
         elif command == "WHATSAT":
             self.transport.write("Not yet implemented")
         else:
